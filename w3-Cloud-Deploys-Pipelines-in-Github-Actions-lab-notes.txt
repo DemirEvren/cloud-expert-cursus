@@ -1,0 +1,173 @@
+Cloud Deploys, aka Continuous Integration in Github Actions
+Lab
+These labs will guide you to implemented the basic CI steps into a Github Actions pipeline. The basic requirements of the application have been covered in the first lab, now let's translate them to an automated CI pipeline
+
+For this lab, we will be focussing not on the complex, 3-tier ToDo app but take a step back and focus on a singular application to deploy.
+
+Checking out the code to the runner
+As we've seen in the previous lab, the step to checkout the code onto our deployed runner is an action provided by github at https://github.com/actions/checkout
+
+To complete this exercise fork the following template into your own repository and use this as a starting point for this lab:
+
+https://github.com/PXL-2TIN-DevOps-Resources/nodejs-demo-app/
+Copy to clipboardErrorCopied
+instructions
+Navigate to the Github actions tab in your repository and create a new checkout.yml file. (or re-use the one from the previous lab)
+Edit the file to add the following details:
+Name is "Checkout Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+Verification step that shows the listing and contents of the directories (ls -alhR)
+After it's finished, check out the details of the run in the run overview:checkout verification
+Getting the dependencies and working with them
+To build the code properly we need to install the NPM framework in the correct version and using it to build the code. This is also an action provided by github, more information is found here: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs
+
+instructions
+Navigate to the Github actions tab in your repository and create a new dependencies.yml file. (or start from the checkout.yml from the previous lab)
+Edit the file to add the following details:
+Name is "Dependencies Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+a step that sets up the NPM framework
+Verification step that shows the listing and contents of the directories (ls -alhR)
+After it's finished, check out the details of the run in the run overview:node install
+Compiling the code
+To build the code properly we will build upon the previous actions file and add a build step to it. This is also in the Github provided action, more information is found here: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs
+instructions
+Navigate to the Github actions tab in your repository and edit the previous dependencies.yml file, to keep them separate, rename it to build.yml
+Edit the file to add the following details:
+Name is "Build Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+a step that sets up the NPM framework
+a step that builds the code.
+After it's finished, check out the details of the run in the run overview:checkout verification
+Unit testing in Github Actions
+To test the code properly we will build upon the previous actions file and add a test step to it. This is also in the Github provided action, more information is found here: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs
+instructions
+Navigate to the Github actions tab in your repository and edit the previoous build.yml file, to keep them separate, rename it to complete.yml
+Edit the file to add the following details:
+Name is "Build Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+a step that sets up the NPM framework
+a step that builds the code.
+add a step that checks the unit tests provided and creates a report.
+After it's finished, check out the details of the run in the run overview:test code
+Better code coverage reporting
+Now, it would be nice to have a better overview of the tests and if they fail which ones fail. To do this, let's find a better report coverage action on the marketplace:code coverage report
+
+Add the action to the end of your workflow file, default settings should work!
+After it's finished, check out the details of the run in the run overview:code coverage report
+packaging the code and creating an artifact
+To archive the code properly we need to create an artifact of the built code and store it somewhere. For this exercise we will be creating a docker container and publishing it on dockerhub.
+
+This is also an action provided by Docker, more information is found here: https://github.com/marketplace/actions/build-and-push-docker-images
+
+Concepts and steps
+This is a more advanced process and will need some additional steps to complete. If you look at the Docker-provided action you will see a LOT of options and settings. This is because we need to break down the process into parts, almost a mini-build process like we just did for the application.
+
+Step 1: Set up docker on the build machine.
+Setting up docker on the build machine is pretty straightforward, much like installing Node.
+Step 2: log in to dockerhub to push the build.
+This step requires you to create a Dockerhub Token in your dockerhub account to give the pipeline access and let it store the newly built image. Once you have this, we will need to store it securily in our repository to use it at runtime. DO NOT HARDCODE CREDENTIALS IN ANY FILES IN YOUR REPOSITORY use the secrets and variables settings in your repository:github secrets
+Step 3: the actual build and push step.
+This step will give context to the build and where to push it to on Dockerhub.
+This action allows for a lot more, for example it is capable of doing builds for multiple different platforms with the help of Qemu, share docker images between jobs and registries and other things. For now, lets keep it simple and just build an x86 image.
+
+To do this, you will need to create a Dockerfile fore the application and add it to the repository. Make sure to check the application README to see what is need for the application, in this instance for example we need to make sure the environment file is set correctly. For now we'll just set it manually, but this will be handled dynamically in the next CD lab.
+
+instructions
+Create a Dockerfile for the application and add it to the repository
+
+Navigate to the Github actions tab in your repository and copy the complete.yml file from the previous lab to a complete-docker.yml file.
+
+Edit the file to add the following details:
+
+Name is "Docker Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+previous steps to add node, install dependencies, and test the code.
+a step thaty logs into dockerhub
+a step that builds the docker container
+a step that places this docker artifact on dockerhub
+After it's finished, check out the details of the run in the run overview:Docker build
+
+check out your dockerhub page and pull the built container locally to verify it works.
+
+Automated Cloud deployments: AWS
+Lab
+In the previous lab, we created an automated CI pipeline that prepares all requirements, builds and tests the code and creates an artifact (Docker container) and stores that.
+
+Next steps in the chain is the CD or deployment parts to get the application to our end-users in a quick, controlled way.
+
+The starting point of this lab will be the same application:
+
+https://github.com/PXL-2TIN-DevOps-Resources/nodejs-demo-app/
+Copy to clipboardErrorCopied
+But ideally you should continue work with the Actions workflow you created in the CI labs.
+
+Deploying the artifact to a Test Environment
+Before we begin with the CD pipeline in Github Actions, we got to take a step back and have a look at where we want to deploy our application. What is our Test Environment and how can we control it?
+
+For this lab, we will be focussing on AWS.
+
+creating a test environment
+AWS EC2/Cloud VM
+Create an T3.micro VM with an Ubuntu 24.04 LTS OS using the default settings.
+Make sure you run sudo apt update/upgrade to bring it up to date.
+Check network connectivity to see if it can access the internet.
+Add a security group to it to make ports 22 and 5000 accesible from to the internet to the VM.
+Add the ssh key to your Github Actions Secrets store to make sure our deployment action can access the machine securily
+Make sure Docker is installed on the server. (you can use this resource to help you: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04)
+automating deployment to the environment
+AWS EC2/Cloud VM To do a deployment, we can either add a job to the build workflow OR add a separate deployment workflow.
+For deployments, and especially production deployments, we want more control as to not accidentally do something that endangers production.
+
+Navigate to the Github actions tab in your repository and create a new test-deployment.yml file.
+To interact with the cloud VM, we'll make use of SSH (this marketplace action can help: https://github.com/marketplace/actions/ssh-remote-commands)
+Connect to the server and make sure the latest version of our application is downloaded AND that this newest version is started.testy deploy
+verifying the deployment
+AWS EC2/Cloud VM
+Deploying the artifact to the Production Environment
+For our Production deploy, we will need to create a publicly available server, so here the choice is obvious for our purposes, we'll be using an AWS EC2 for this.
+
+creating a production environment
+Create an T3.micro VM with an Ubuntu 24.04 LTS OS using the default settings.
+Make sure you run sudo apt update/upgrade to bring it up to date.
+Check network connectivity to see if it can access the internet.
+Add a security group to it to make ports 22 and 80 accesible from to the internet to the VM.
+Add the ssh key to your Github Actions Secrets store to make sure our deployment action can access the machine securily
+Make sure Docker is installed on the server. (you can use this resource to help you: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04)
+automating deployment to the environment
+To do a deployment, we can either add a job to the build workflow OR add a separate deployment workflow.
+
+For deployments, and especially production deployments, we want more control as to not accidentally do something that endangers production.
+
+Navigate to the Github actions tab in your repository and create a new production-deployment.yml file.
+To interact with the cloud VM, we'll make use of SSH (this marketplace action can help: https://github.com/marketplace/actions/ssh-remote-commands) Looking at their example, you'll notice you will need to use the github actions secrets store to store server and account information to log in to the server.
+Connect to the server and make sure the latest version of our application is downloaded AND that this newest version is started.
+Be sure to change the startup command to enable to application to work in the standard http port!
+testy deploy
+
+Overview
+If we go to the summary, we can see all green deployments:
+
+all deploy
+
+verifying the deployment
+Automating the infrastructure
+The next step in our deployment journey is to take the automated deployment one step further and automate the infrastructure as well. We'll start with the test environment
+
+Automated test infrastruture deployment
+Start with the previous CI/CD pipeline, but add a step called "set up test server". Add the following steps:
+
+Use AWS CLI/Terraform/Ansible to create an automated deploy of the EC2 Test server as defined in the previous pipelines ( T3.micro VM with an Ubuntu 24.04 LTS OS)
+Make sure any previous version of the application EC2's are terminated
+Think about practical application:
+Do we re-use the same VPC/security groups/subnets or do we (re)create them from scratch?
+Configuration management
+Up till now we have not made any distinctions between test and production other then location (public/private cloud) and some manual config to start the docker container on the correct port.
+
+However, this should not be manual but in clearly defined configuration parameters, so we can automate it.
+

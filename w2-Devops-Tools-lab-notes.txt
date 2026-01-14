@@ -1,0 +1,89 @@
+DevOps Tools
+Continuous Integration in Github Actions
+These labs will guide you to implemented the basic CI steps into a Github Actions pipeline. The basic requirements of the application have been covered in the first lab, now let's translate them to an automated CI pipeline
+
+Firstly, if you want an extra introduction to Github Actions, there is this extra lab: Github Actions Basics
+
+To complete this exercise we'll continue using the https://github.com/2TIN-CloudServices1/CloudToDoApp application.
+
+To build the code properly we need to check out the requirements in the application repository. Notice that front- and backend do not have the same requirements. To make deployments easier, we will split up the CI pipeline into 2 separate workflows, separating front- and backend.
+
+Frontend
+Checking out the code to the runner:
+First we need to checkout the code onto our deployed runner an action is provided by github at https://github.com/actions/checkout
+Getting the dependencies and working with them:
+To build this application properly, we will need to install Node and the Angular CLI framework in the correct version.
+Compiling the code:
+After we've installed Angular, we use it to build the code. This is also an action provided by github, more information is found here:
+Unit testing in Github Actions:
+To test the code properly we will build upon the previous actions file and add a test step to it.
+Better code coverage reporting:
+Now, it would be nice to have a better overview of the tests and if they fail which ones fail. To do this, let's find a better report coverage action on the marketplace:code coverage reportAdd the action to the end of your workflow file, default settings should work!
+instructions
+Navigate to the Github actions tab in your repository and create a new workflow file called frontend-CI.yml
+Edit the file to add the following details:
+Name is "Backend"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+a step that sets up the NPM and Angular frameworksnode install
+a step that builds the code.checkout verification
+add a step that checks the unit tests provided and creates a report.test code
+After it's finished, check out the details of the run in the run overview and check the code coverage report:
+code coverage report
+Backend
+Checking out the code to the runner:
+First we need to checkout the code onto our deployed runner an action is provided by github at https://github.com/actions/checkout
+Getting the dependencies and working with them:
+To build this application properly, we will need to install the NPM framework in the correct version.
+Compiling the code:
+After we've installed Node, we use it to build the code. This is also an action provided by github, more information is found here: https://docs.github.com/en/actions/use-cases-and-examples/building-and-testing/building-and-testing-nodejs
+Unit testing in Github Actions:
+To test the code properly we will build upon the previous actions file and add a test step to it.
+Better code coverage reporting:
+Now, it would be nice to have a better overview of the tests and if they fail which ones fail. To do this, let's find a better report coverage action on the marketplace:code coverage reportAdd the action to the end of your workflow file, default settings should work!
+instructions
+Navigate to the Github actions tab in your repository and create a new workflow file called backend-CI.yml
+Edit the file to add the following details:
+Name is "Backend"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+a step that sets up the NPM frameworknode install
+a step that builds the code.checkout verification
+add a step that checks the unit tests provided and creates a report.test code
+After it's finished, check out the details of the run in the run overview and check the code coverage report:
+code coverage report
+packaging the code and creating an artifact
+To archive the code properly we need to create an artifact of the built code and store it somewhere. For this exercise we will be creating a docker container and publishing it on dockerhub.
+
+This is also an action provided by Docker, more information is found here: https://github.com/marketplace/actions/build-and-push-docker-images
+
+Concepts and steps
+This is a more advanced process and will need some additional steps to complete. If you look at the Docker-provided action you will see a LOT of options and settings. This is because we need to break down the process into parts, almost a mini-build process like we just did for the application.
+
+Step 1: Set up docker on the build machine.
+Setting up docker on the build machine is pretty straightforward, much like installing Node.
+Step 2: log in to dockerhub to push the build.
+This step requires you to create a Dockerhub Token in your dockerhub account to give the pipeline access and let it store the newly built image. Once you have this, we will need to store it securily in our repository to use it at runtime. DO NOT HARDCODE CREDENTIALS IN ANY FILES IN YOUR REPOSITORY use the secrets and variables settings in your repository:github secrets
+Step 3: the actual build and push step.
+This step will give context to the build and where to push it to on Dockerhub.
+This action allows for a lot more, for example it is capable of doing builds for multiple different platforms with the help of Qemu, share docker images between jobs and registries and other things. For now, lets keep it simple and just build an x86 image.
+
+To do this, you will need to create a Dockerfile fore the application and add it to the repository. Make sure to check the application README to see what is need for the application, in this instance for example we need to make sure the environment file is set correctly. For now we'll just set it manually, but this will be handled dynamically in the next CD lab.
+
+instructions
+Create a Dockerfile for the application and add it to the repository
+
+Navigate to the Github actions tab in your repository and copy the complete.yml file from the previous lab to a complete-docker.yml file.
+
+Edit the file to add the following details:
+
+Name is "Docker Example"
+Runs on Ubuntu-latest
+a step that uses Checkout to check the code in the repository out to the runner
+previous steps to add node, install dependencies, and test the code.
+a step thaty logs into dockerhub
+a step that builds the docker container
+a step that places this docker artifact on dockerhub
+After it's finished, check out the details of the run in the run overview:Docker build
+
+check out your dockerhub page and pull the built container locally to verify it works.

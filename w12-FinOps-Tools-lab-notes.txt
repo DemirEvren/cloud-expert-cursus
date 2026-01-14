@@ -1,0 +1,32 @@
+FinOps
+Cost Visualization
+Introduction
+This hands-on lab will guide you through the steps to perform visualization of your AWS cost and usage. The skills you learn will help you monitor your cost and usage, in alignment with the AWS Well-Architected Framework.
+
+Budgets and notifications are updated when your billing data is updated, which is at least once per day.
+
+NOTE: You may not receive an alarm for a forecasted budget if your account is new. Forecasting requires existing usage within the account.
+
+View your cost and usage by service
+AWS Cost Explorer is a free built in tool that lets you dive deeper into your cost and usage data to identify trends, pinpoint cost drivers, and detect anomalies. We will examine costs by service in this exercise.
+
+Log into the console via SSO and go to the Costs Explorer
+learner lab2. Click on Reports from the left menu 3. You will be presented a list of pre-configured and saved reports. Click on Monthly costs by servicelearner lab4. Change to a daily view to highlight trends. Select the Monthly drop down and click on Daily. 5. The bar graph is difficult to read, so we will switch to a line graph. Click on the Bar dropdown, then select Line.
+
+You have now viewed the costs by service and applied multiple filters. You can continue to modify the report by timeframe and apply other filters.
+
+Create custom EC2 reports
+We will now create some custom EC2 reports, which will help to show ongoing costs related to EC2 instances and their associated usage.
+
+From the left menu click Cost Explorer, click Reports, and click Monthly costs by service
+You will have the default breakdown by Service. Click on the Service filter on the right, select EC2-Instances (Elastic Compute Cloud - Compute) and EC2-Other, then click Apply filters.
+You will now have monthly EC2 Instance and Other costs.
+Change the Group by to Usage Type
+These are your on-demand EC2 costs, you should setup a report like this for your services that have the highest usage or costs. We will now save this, click on Save as…
+Make a report that showcases the usecase of our application. Focus on Relational:
+Database service
+Data Transfer
+EC2-Instances
+Elastic Loadbalancing
+End result
+After finishing this lab you should have a basic grasp of cost estimation and optimization in AWS Academy Cloud.
